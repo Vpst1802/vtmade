@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Item Popularity Bubble Chart</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.7.0/d3.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+        }
+        #chart {
+            width: 100vw;
+            height: 100vh;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="chart"></div>
+    <script>
+        const data = [
+            {"name":"Charger","value":18587,"category":"Electronics"},
+            {"name":"Gym","value":11939,"category":"Health & Fitness"},
+            {"name":"Grater","value":10581,"category":"Kitchen"},
+            {"name":"CO Detector","value":10513,"category":"Home Safety"},
+            {"name":"Library Card","value":9665,"category":"Education"},
+            {"name":"Bidet","value":9114,"category":"Bathroom"},
+            {"name":"First Aid Kit","value":6902,"category":"Health & Fitness"},
+            {"name":"Squatty Potty","value":5007,"category":"Bathroom"},
+            {"name":"Throw","value":4766,"category":"Home Decor"},
+            {"name":"Hiking Shoes","value":4442,"category":"Outdoor"},
+            {"name":"Dashcam","value":4403,"category":"Auto"},
+            {"name":"Nicotine Therapy","value":4299,"category":"Health & Fitness"},
+            {"name":"Monitor","value":3989,"category":"Electronics"},
+            {"name":"Earbuds","value":3567,"category":"Electronics"},
+            {"name":"Water Bottle","value":3245,"category":"Health & Fitness"},
+            {"name":"Toothbrush","value":3023,"category":"Personal Care"},
+            {"name":"Power Bank","value":2876,"category":"Electronics"},
+            {"name":"Projector","value":2796,"category":"Electronics"},
+            {"name":"Air Compressor","value":2638,"category":"Tools"},
+            {"name":"Alarm Clock","value":2617,"category":"Electronics"},
+            {"name":"Pillow","value":2555,"category":"Bedroom"},
+            {"name":"Garden Book","value":2475,"category":"Outdoor"},
+            {"name":"Dumbbells","value":2345,"category":"Health & Fitness"},
+            {"name":"Speaker","value":2134,"category":"Electronics"},
+            {"name":"BP Monitor","value":2069,"category":"Health & Fitness"},
+            {"name":"Water Flosser","value":2085,"category":"Personal Care"},
+            {"name":"Curtains","value":1987,"category":"Home Decor"},
+            {"name":"Kettle","value":1987,"category":"Kitchen"},
+            {"name":"Emergency Kit","value":1876,"category":"Home Safety"},
+            {"name":"Air Fryer","value":1858,"category":"Kitchen"},
+            {"name":"Slow Cooker","value":1765,"category":"Kitchen"},
+            {"name":"Batteries","value":1543,"category":"Electronics"},
+            {"name":"Suit","value":1511,"category":"Clothing"},
+            {"name":"Baby Blanket","value":1467,"category":"Baby"},
+            {"name":"Yoga Mat","value":1456,"category":"Health & Fitness"},
+            {"name":"Drying Rack","value":1362,"category":"Laundry"},
+            {"name":"Waterpik","value":1333,"category":"Personal Care"},
+            {"name":"Taxi","value":1202,"category":"Transportation"},
+            {"name":"Tool Set","value":1203,"category":"Tools"},
+            {"name":"Cat","value":1149,"category":"Pets"},
+            {"name":"Socks Set","value":1177,"category":"Clothing"},
+            {"name":"Jump Pack","value":1094,"category":"Auto"},
+            {"name":"Coffee Maker","value":876,"category":"Kitchen"},
+            {"name":"Garden Kit","value":876,"category":"Outdoor"},
+            {"name":"Hammock","value":987,"category":"Outdoor"},
+            {"name":"Keyboard","value":765,"category":"Electronics"},
+            {"name":"Hand Warmer","value":765,"category":"Outdoor"},
+            {"name":"Board Game","value":727,"category":"Entertainment"},
+            {"name":"Razor Set","value":678,"category":"Personal Care"},
+            {"name":"Inhaler","value":653,"category":"Health & Fitness"},
+            {"name":"Shower Filter","value":652,"category":"Bathroom"},
+            {"name":"Password Manager","value":654,"category":"Software"},
+            {"name":"Produce Bags","value":654,"category":"Kitchen"},
+            {"name":"Pen","value":640,"category":"Office"},
+            {"name":"Fan","value":631,"category":"Home Appliances"},
+            {"name":"Headset","value":605,"category":"Electronics"},
+            {"name":"Dog","value":581,"category":"Pets"},
+            {"name":"Antihistamines","value":548,"category":"Health & Fitness"},
+            {"name":"Foam Roller","value":543,"category":"Health & Fitness"},
+            {"name":"Spice Rack","value":543,"category":"Kitchen"},
+            {"name":"Dry Bag","value":543,"category":"Outdoor"},
+            {"name":"Mini Washer","value":462,"category":"Laundry"},
+            {"name":"Backscratcher","value":478,"category":"Personal Care"},
+            {"name":"Power Drill","value":479,"category":"Tools"},
+            {"name":"Heat Pad","value":433,"category":"Health & Fitness"},
+            {"name":"Resistance Bands","value":432,"category":"Health & Fitness"},
+            {"name":"Thermometer","value":432,"category":"Health & Fitness"},
+            {"name":"Baking Mats","value":432,"category":"Kitchen"},
+            {"name":"Soldering Iron","value":415,"category":"Tools"},
+            {"name":"Insoles","value":400,"category":"Clothing"},
+            {"name":"Bed Sheets","value":367,"category":"Bedroom"},
+            {"name":"Pet Camera","value":365,"category":"Pets"},
+            {"name":"Weighted Blanket","value":330,"category":"Bedroom"},
+            {"name":"Exfoliating Gloves","value":329,"category":"Personal Care"},
+            {"name":"Lunch Bag","value":321,"category":"Kitchen"},
+            {"name":"Cleaning Cloths","value":321,"category":"Cleaning"},
+            {"name":"Steel Straws","value":321,"category":"Kitchen"},
+            {"name":"Makeup Organizer","value":315,"category":"Personal Care"},
+            {"name":"Portable Campfire","value":298,"category":"Outdoor"},
+            {"name":"Stomach Pillow","value":287,"category":"Bedroom"},
+            {"name":"Dish Cloths","value":284,"category":"Kitchen"},
+            {"name":"Bra","value":228,"category":"Clothing"},
+            {"name":"Running Shoes","value":216,"category":"Health & Fitness"},
+            {"name":"Sneakers","value":212,"category":"Clothing"},
+            {"name":"Laptop Stand","value":184,"category":"Office"},
+            {"name":"Water Hoses","value":156,"category":"Outdoor"},
+            {"name":"Work Boots","value":153,"category":"Clothing"},
+            {"name":"Ice Maker","value":126,"category":"Kitchen"},
+            {"name":"Hiking Gear","value":116,"category":"Outdoor"},
+            {"name":"Massager","value":114,"category":"Health & Fitness"},
+            {"name":"De-piller","value":101,"category":"Laundry"},
+            {"name":"Shoehorn","value":72,"category":"Clothing"},
+            {"name":"Neck Fan","value":70,"category":"Personal Care"},
+            {"name":"Gloves","value":70,"category":"Clothing"},
+            {"name":"Bath Soaps","value":47,"category":"Personal Care"},
+            {"name":"Heavy Blanket","value":38,"category":"Bedroom"},
+            {"name":"Water Container","value":234,"category":"Outdoor"}
+        ];
+
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+        const bubble = d3.pack()
+            .size([width, height])
+            .padding(1.5);
+
+        const svg = d3.select("#chart")
+            .append("svg")
+            .attr("viewBox", [0, 0, width, height])
+            .attr("width", width)
+            .attr("height", height)
+            .attr("style", "max-width: 100%; height: auto;");
+
+        const root = d3.hierarchy({children: data})
+            .sum(d => d.value);
+
+        const node = svg.selectAll()
+            .data(bubble(root).descendants().slice(1))
+            .join("g")
+            .attr("transform", d => `translate(${d.x},${d.y})`);
+
+        const circle = node.append("circle")
+            .attr("r", d => d.r)
+            .attr("fill-opacity", 0.7)
+            .attr("fill", d => color(d.data.category));
+
+        const label = node.append("text")
+            .attr("dy", ".3em")
+            .style("text-anchor", "middle")
+            .style("font-size", d => `${Math.min(d.r/3, 12)}px`)
+            .text(d => d.data.name);
+
+        // Zoom functionality
+        const zoom = d3.zoom()
+            .scaleExtent([1, 8])
+            .on("zoom", zoomed);
+
+        svg.call(zoom);
+
+        function zoomed(event) {
+            node.attr("transform", d => `translate(${d.x * event.transform.k + event.transform.x},${d.y * event.transform.k + event.transform.y}) scale(${event.transform.k})`);
+        }
+
+        // Tooltip
+        const tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        node.on("mouseover", function(event, d) {
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+            tooltip.html(`${d.data.name}<br/>Category: ${d.data.category}<br/>Value: ${d.data.value}`)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function(d) {
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+    </script>
+</body>
+</html>
